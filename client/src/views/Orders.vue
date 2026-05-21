@@ -397,30 +397,28 @@ export default {
   text-decoration: underline;
 }
 
-/* Dropdown container */
+/* Items list — opens in-flow below the summary so it pushes rows down
+ * instead of overlaying them. The previous absolute-popover variant
+ * floated on top of other rows, which made it hard to read both the
+ * dropdown and the underlying table at the same time. */
 .items-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
   margin-top: 0.5rem;
-  background: white;
+  background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 0.75rem;
-  z-index: 10;
-  min-width: 300px;
-  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  min-width: 260px;
+  max-width: 360px;
+  max-height: 220px;
+  overflow-y: auto;
 }
 
 .item-entry {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  gap: 0.125rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .item-entry:last-child {
@@ -431,11 +429,27 @@ export default {
   font-size: 0.875rem;
   font-weight: 500;
   color: #0f172a;
+  white-space: normal;
 }
 
 .item-meta {
-  font-size: 0.813rem;
+  font-size: 0.8125rem;
   color: #64748b;
+}
+
+/* Dark-mode overrides for the items list */
+:root.dark .items-dropdown {
+  background: #0e1426;
+  border-color: #1e2a4a;
+}
+:root.dark .item-entry {
+  border-color: #1e2a4a;
+}
+:root.dark .item-name {
+  color: #f1f5f9;
+}
+:root.dark .item-meta {
+  color: #94a3b8;
 }
 
 /* Submitted badge — distinguishes new restock orders in the dedicated section */

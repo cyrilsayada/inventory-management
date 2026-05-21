@@ -39,11 +39,14 @@ def apply_filters(items: list, warehouse: Optional[str] = None, category: Option
     if warehouse and warehouse != 'all':
         filtered = [item for item in filtered if item.get('warehouse') == warehouse]
 
+    # `.get(key, '')` only defaults on missing keys — if the key is present with value None
+    # (POSTed restock orders omit category/warehouse), .lower() blew up with a 500. Coerce to ''
+    # so the filter just drops those items instead of crashing the request.
     if category and category != 'all':
-        filtered = [item for item in filtered if item.get('category', '').lower() == category.lower()]
+        filtered = [item for item in filtered if (item.get('category') or '').lower() == category.lower()]
 
     if status and status != 'all':
-        filtered = [item for item in filtered if item.get('status', '').lower() == status.lower()]
+        filtered = [item for item in filtered if (item.get('status') or '').lower() == status.lower()]
 
     return filtered
 

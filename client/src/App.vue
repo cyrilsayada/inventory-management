@@ -25,9 +25,19 @@
               />
               <input
                 type="text"
+                v-model="searchQuery"
                 placeholder="Search inventory, orders…"
                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:border-sia-blue focus:bg-white focus:ring-2 focus:ring-sia-blue/10 transition dark:bg-slate-800 dark:border-sia-border dark:placeholder:text-slate-500 dark:text-slate-100 dark:focus:bg-slate-800"
               />
+              <button
+                v-if="searchQuery"
+                @click="clearSearch"
+                aria-label="Clear search"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded"
+                type="button"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
             </div>
           </div>
 
@@ -95,6 +105,7 @@ import { api } from "./api";
 import { useAuth } from "./composables/useAuth";
 import { useI18n } from "./composables/useI18n";
 import { useTheme } from "./composables/useTheme";
+import { useSearch } from "./composables/useSearch";
 import SidebarNav from "./components/SidebarNav.vue";
 import FilterBar from "./components/FilterBar.vue";
 import ProfileMenu from "./components/ProfileMenu.vue";
@@ -125,6 +136,9 @@ export default {
     // Dark mode toggle wiring. The composable already applied the initial
     // theme at module load, so all we need here is the reactive ref + handler.
     const { theme, toggleTheme } = useTheme();
+    // Global search query — top-bar input v-models this; consuming views
+    // (currently Inventory) read it via the same composable. See useSearch.js.
+    const { searchQuery, clearSearch } = useSearch();
     const showProfileDetails = ref(false);
     const showTasks = ref(false);
     const apiTasks = ref([]);
@@ -229,6 +243,8 @@ export default {
       toggleTask,
       theme,
       toggleTheme,
+      searchQuery,
+      clearSearch,
     };
   },
 };

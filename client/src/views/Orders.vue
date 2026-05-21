@@ -1,46 +1,60 @@
 <template>
   <div class="orders">
     <div class="page-header">
-      <h2>{{ t('orders.title') }}</h2>
-      <p>{{ t('orders.description') }}</p>
+      <h2>{{ t("orders.title") }}</h2>
+      <p>{{ t("orders.description") }}</p>
     </div>
 
-    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+    <div v-if="loading" class="loading">{{ t("common.loading") }}</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
       <div class="stats-grid">
         <div class="stat-card success">
-          <div class="stat-label">{{ t('status.delivered') }}</div>
-          <div class="stat-value">{{ getOrdersByStatus('Delivered').length }}</div>
+          <div class="stat-label">{{ t("status.delivered") }}</div>
+          <div class="stat-value">
+            {{ getOrdersByStatus("Delivered").length }}
+          </div>
         </div>
         <div class="stat-card info">
-          <div class="stat-label">{{ t('status.shipped') }}</div>
-          <div class="stat-value">{{ getOrdersByStatus('Shipped').length }}</div>
+          <div class="stat-label">{{ t("status.shipped") }}</div>
+          <div class="stat-value">
+            {{ getOrdersByStatus("Shipped").length }}
+          </div>
         </div>
         <div class="stat-card warning">
-          <div class="stat-label">{{ t('status.processing') }}</div>
-          <div class="stat-value">{{ getOrdersByStatus('Processing').length }}</div>
+          <div class="stat-label">{{ t("status.processing") }}</div>
+          <div class="stat-value">
+            {{ getOrdersByStatus("Processing").length }}
+          </div>
         </div>
         <div class="stat-card danger">
-          <div class="stat-label">{{ t('status.backordered') }}</div>
-          <div class="stat-value">{{ getOrdersByStatus('Backordered').length }}</div>
+          <div class="stat-label">{{ t("status.backordered") }}</div>
+          <div class="stat-value">
+            {{ getOrdersByStatus("Backordered").length }}
+          </div>
         </div>
       </div>
 
       <div v-if="submittedOrders.length > 0" class="card">
         <div class="card-header">
-          <h3 class="card-title">Submitted Orders ({{ submittedOrders.length }})</h3>
+          <h3 class="card-title">
+            Submitted Orders ({{ submittedOrders.length }})
+          </h3>
         </div>
         <div class="table-container">
           <table class="orders-table">
             <thead>
               <tr>
-                <th class="col-order-number">{{ t('orders.table.orderNumber') }}</th>
-                <th class="col-items">{{ t('orders.table.items') }}</th>
-                <th class="col-date">{{ t('orders.table.orderDate') }}</th>
-                <th class="col-date">{{ t('orders.table.expectedDelivery') }}</th>
+                <th class="col-order-number">
+                  {{ t("orders.table.orderNumber") }}
+                </th>
+                <th class="col-items">{{ t("orders.table.items") }}</th>
+                <th class="col-date">{{ t("orders.table.orderDate") }}</th>
+                <th class="col-date">
+                  {{ t("orders.table.expectedDelivery") }}
+                </th>
                 <th class="col-date">Lead Time (days)</th>
-                <th class="col-value">{{ t('orders.table.totalValue') }}</th>
+                <th class="col-value">{{ t("orders.table.totalValue") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -52,20 +66,38 @@
                 <td class="col-items">
                   <details class="items-details">
                     <summary class="items-summary">
-                      {{ t('orders.itemsCount', { count: order.items.length }) }}
+                      {{
+                        t("orders.itemsCount", { count: order.items.length })
+                      }}
                     </summary>
                     <div class="items-dropdown">
-                      <div v-for="(item, idx) in order.items" :key="idx" class="item-entry">
-                        <span class="item-name">{{ translateProductName(item.name) }}</span>
-                        <span class="item-meta">{{ t('orders.quantity') }}: {{ item.quantity }} @ {{ currencySymbol }}{{ item.unit_price }}</span>
+                      <div
+                        v-for="(item, idx) in order.items"
+                        :key="idx"
+                        class="item-entry"
+                      >
+                        <span class="item-name">{{
+                          translateProductName(item.name)
+                        }}</span>
+                        <span class="item-meta"
+                          >{{ t("orders.quantity") }}: {{ item.quantity }} @
+                          {{ currencySymbol }}{{ item.unit_price }}</span
+                        >
                       </div>
                     </div>
                   </details>
                 </td>
                 <td class="col-date">{{ formatDate(order.order_date) }}</td>
-                <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
+                <td class="col-date">
+                  {{ formatDate(order.expected_delivery) }}
+                </td>
                 <td class="col-date">{{ leadTimeDays(order) }}</td>
-                <td class="col-value"><strong>{{ currencySymbol }}{{ order.total_value.toLocaleString() }}</strong></td>
+                <td class="col-value">
+                  <strong
+                    >{{ currencySymbol
+                    }}{{ order.total_value.toLocaleString() }}</strong
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
@@ -74,34 +106,57 @@
 
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">{{ t('orders.allOrders') }} ({{ orders.length }})</h3>
+          <h3 class="card-title">
+            {{ t("orders.allOrders") }} ({{ filteredOrders.length
+            }}<span v-if="searchQuery"> of {{ orders.length }}</span
+            >)
+          </h3>
         </div>
         <div class="table-container">
           <table class="orders-table">
             <thead>
               <tr>
-                <th class="col-order-number">{{ t('orders.table.orderNumber') }}</th>
-                <th class="col-customer">{{ t('orders.table.customer') }}</th>
-                <th class="col-items">{{ t('orders.table.items') }}</th>
-                <th class="col-status">{{ t('orders.table.status') }}</th>
-                <th class="col-date">{{ t('orders.table.orderDate') }}</th>
-                <th class="col-date">{{ t('orders.table.expectedDelivery') }}</th>
-                <th class="col-value">{{ t('orders.table.totalValue') }}</th>
+                <th class="col-order-number">
+                  {{ t("orders.table.orderNumber") }}
+                </th>
+                <th class="col-customer">{{ t("orders.table.customer") }}</th>
+                <th class="col-items">{{ t("orders.table.items") }}</th>
+                <th class="col-status">{{ t("orders.table.status") }}</th>
+                <th class="col-date">{{ t("orders.table.orderDate") }}</th>
+                <th class="col-date">
+                  {{ t("orders.table.expectedDelivery") }}
+                </th>
+                <th class="col-value">{{ t("orders.table.totalValue") }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="order in orders" :key="order.id">
-                <td class="col-order-number"><strong>{{ order.order_number }}</strong></td>
-                <td class="col-customer">{{ translateCustomerName(order.customer) }}</td>
+              <tr v-for="order in filteredOrders" :key="order.id">
+                <td class="col-order-number">
+                  <strong>{{ order.order_number }}</strong>
+                </td>
+                <td class="col-customer">
+                  {{ translateCustomerName(order.customer) }}
+                </td>
                 <td class="col-items">
                   <details class="items-details">
                     <summary class="items-summary">
-                      {{ t('orders.itemsCount', { count: order.items.length }) }}
+                      {{
+                        t("orders.itemsCount", { count: order.items.length })
+                      }}
                     </summary>
                     <div class="items-dropdown">
-                      <div v-for="(item, idx) in order.items" :key="idx" class="item-entry">
-                        <span class="item-name">{{ translateProductName(item.name) }}</span>
-                        <span class="item-meta">{{ t('orders.quantity') }}: {{ item.quantity }} @ {{ currencySymbol }}{{ item.unit_price }}</span>
+                      <div
+                        v-for="(item, idx) in order.items"
+                        :key="idx"
+                        class="item-entry"
+                      >
+                        <span class="item-name">{{
+                          translateProductName(item.name)
+                        }}</span>
+                        <span class="item-meta"
+                          >{{ t("orders.quantity") }}: {{ item.quantity }} @
+                          {{ currencySymbol }}{{ item.unit_price }}</span
+                        >
                       </div>
                     </div>
                   </details>
@@ -112,8 +167,15 @@
                   </span>
                 </td>
                 <td class="col-date">{{ formatDate(order.order_date) }}</td>
-                <td class="col-date">{{ formatDate(order.expected_delivery) }}</td>
-                <td class="col-value"><strong>{{ currencySymbol }}{{ order.total_value.toLocaleString() }}</strong></td>
+                <td class="col-date">
+                  {{ formatDate(order.expected_delivery) }}
+                </td>
+                <td class="col-value">
+                  <strong
+                    >{{ currencySymbol
+                    }}{{ order.total_value.toLocaleString() }}</strong
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
@@ -124,22 +186,24 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, computed } from 'vue'
-import { api } from '../api'
-import { useFilters } from '../composables/useFilters'
-import { useI18n } from '../composables/useI18n'
+import { ref, onMounted, watch, computed } from "vue";
+import { api } from "../api";
+import { useFilters } from "../composables/useFilters";
+import { useI18n } from "../composables/useI18n";
+import { useSearch } from "../composables/useSearch";
 
 export default {
-  name: 'Orders',
+  name: "Orders",
   setup() {
-    const { t, currentCurrency, translateProductName, translateCustomerName } = useI18n()
+    const { t, currentCurrency, translateProductName, translateCustomerName } =
+      useI18n();
 
     const currencySymbol = computed(() => {
-      return currentCurrency.value === 'JPY' ? '¥' : '$'
-    })
-    const loading = ref(true)
-    const error = ref(null)
-    const orders = ref([])
+      return currentCurrency.value === "JPY" ? "¥" : "$";
+    });
+    const loading = ref(true);
+    const error = ref(null);
+    const orders = ref([]);
 
     // Use shared filters
     const {
@@ -147,85 +211,112 @@ export default {
       selectedLocation,
       selectedCategory,
       selectedStatus,
-      getCurrentFilters
-    } = useFilters()
+      getCurrentFilters,
+    } = useFilters();
 
     const loadOrders = async () => {
       try {
-        loading.value = true
-        const filters = getCurrentFilters()
-        const fetchedOrders = await api.getOrders(filters)
+        loading.value = true;
+        const filters = getCurrentFilters();
+        const fetchedOrders = await api.getOrders(filters);
 
         // Sort orders by order_date (earliest first)
         orders.value = fetchedOrders.sort((a, b) => {
-          const dateA = new Date(a.order_date)
-          const dateB = new Date(b.order_date)
-          return dateA - dateB
-        })
+          const dateA = new Date(a.order_date);
+          const dateB = new Date(b.order_date);
+          return dateA - dateB;
+        });
       } catch (err) {
-        error.value = 'Failed to load orders: ' + err.message
+        error.value = "Failed to load orders: " + err.message;
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
 
     // Watch for filter changes and reload data
-    watch([selectedPeriod, selectedLocation, selectedCategory, selectedStatus], () => {
-      loadOrders()
-    })
+    watch(
+      [selectedPeriod, selectedLocation, selectedCategory, selectedStatus],
+      () => {
+        loadOrders();
+      },
+    );
 
     const getOrdersByStatus = (status) => {
-      return orders.value.filter(order => order.status === status)
-    }
+      return orders.value.filter((order) => order.status === status);
+    };
 
     // Submitted orders are surfaced in their own section above the full list
     // so freshly-placed restock orders are visible at a glance. They also
     // remain in the main "All Orders" table so no data is hidden from users.
     const submittedOrders = computed(() =>
-      orders.value.filter(o => o.status === 'Submitted')
-    )
+      orders.value.filter((o) => o.status === "Submitted"),
+    );
+
+    // Top-bar search wiring. Matches against order_number, customer, status,
+    // and any item sku/name across order.items. Case-insensitive substring.
+    // Empty query is a no-op — returns the full sorted list untouched.
+    const { searchQuery } = useSearch();
+    const filteredOrders = computed(() => {
+      const q = (searchQuery.value || "").trim().toLowerCase();
+      if (!q) return orders.value;
+      return orders.value.filter((order) => {
+        if (
+          (order.order_number || "").toLowerCase().includes(q) ||
+          (order.customer || "").toLowerCase().includes(q) ||
+          (order.status || "").toLowerCase().includes(q)
+        )
+          return true;
+        return (order.items || []).some(
+          (i) =>
+            (i.sku || "").toLowerCase().includes(q) ||
+            (i.name || "").toLowerCase().includes(q),
+        );
+      });
+    });
 
     // Lead time for a submitted order: prefer the per-item lead_time_days
     // (max across items), fall back to days between order_date and
     // expected_delivery if the items lack that field.
     const leadTimeDays = (order) => {
       const fromItems = (order.items || [])
-        .map(i => i.lead_time_days)
-        .filter(v => typeof v === 'number')
-      if (fromItems.length > 0) return Math.max(...fromItems)
-      const start = new Date(order.order_date)
-      const end = new Date(order.expected_delivery)
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) return '—'
-      return Math.round((end - start) / (1000 * 60 * 60 * 24))
-    }
+        .map((i) => i.lead_time_days)
+        .filter((v) => typeof v === "number");
+      if (fromItems.length > 0) return Math.max(...fromItems);
+      const start = new Date(order.order_date);
+      const end = new Date(order.expected_delivery);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return "—";
+      return Math.round((end - start) / (1000 * 60 * 60 * 24));
+    };
 
     const getOrderStatusClass = (status) => {
       const statusMap = {
-        'Delivered': 'success',
-        'Shipped': 'info',
-        'Processing': 'warning',
-        'Backordered': 'danger'
-      }
-      return statusMap[status] || 'info'
-    }
+        Delivered: "success",
+        Shipped: "info",
+        Processing: "warning",
+        Backordered: "danger",
+      };
+      return statusMap[status] || "info";
+    };
 
     const formatDate = (dateString) => {
-      const { currentLocale } = useI18n()
-      const locale = currentLocale.value === 'ja' ? 'ja-JP' : 'en-US'
+      const { currentLocale } = useI18n();
+      const locale = currentLocale.value === "ja" ? "ja-JP" : "en-US";
       return new Date(dateString).toLocaleDateString(locale, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    }
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    };
 
-    onMounted(loadOrders)
+    onMounted(loadOrders);
 
     return {
       t,
       loading,
       error,
       orders,
+      filteredOrders,
+      searchQuery,
       submittedOrders,
       leadTimeDays,
       getOrdersByStatus,
@@ -233,10 +324,10 @@ export default {
       formatDate,
       currencySymbol,
       translateProductName,
-      translateCustomerName
-    }
-  }
-}
+      translateCustomerName,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -290,7 +381,7 @@ export default {
 }
 
 .items-summary::before {
-  content: '▶';
+  content: "▶";
   display: inline-block;
   margin-right: 0.375rem;
   font-size: 0.75rem;
@@ -315,7 +406,9 @@ export default {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 0.75rem;
   z-index: 10;
   min-width: 300px;
